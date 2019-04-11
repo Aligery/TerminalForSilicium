@@ -1,5 +1,5 @@
+ru/miet/robotics/PortReader.class
+ru/miet/robotics/ConnectionToSerialPort.class
 ru/miet/robotics/Settings.class
 ru/miet/robotics/Main.class
-ru/miet/robotics/PortReader.class
 ru/miet/robotics/Controller.class
-ru/miet/robotics/ConnectionToSerialPort.class
