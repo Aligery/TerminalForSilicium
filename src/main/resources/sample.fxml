@@ -89,13 +89,27 @@
                </children>
             </VBox>
          </children></AnchorPane>
-    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="462.0" prefWidth="416.0">
+      <HBox prefHeight="100.0" prefWidth="200.0">
          <children>
-            <TextArea id="InfoText" fx:id="textArea" editable="false" layoutX="65.0" layoutY="75.0" prefHeight="200.0" prefWidth="200.0" promptText="InfoText" wrapText="true" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-            </TextArea>
-         </children></AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="462.0" prefWidth="416.0">
+               <children>
+                  <TextArea id="InfoText" fx:id="sendedInfo" editable="false" layoutX="65.0" layoutY="75.0" prefHeight="200.0" prefWidth="200.0" promptText="Sended" wrapText="true" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </TextArea>
+               </children>
+            </AnchorPane>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="462.0" prefWidth="416.0">
+               <children>
+                  <TextArea id="InfoText" fx:id="recievedInfo" editable="false" layoutX="65.0" layoutY="75.0" prefHeight="200.0" prefWidth="200.0" promptText="Recieved info" wrapText="true" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </TextArea>
+               </children>
+            </AnchorPane>
+         </children>
+      </HBox>
   </items>
 </SplitPane>

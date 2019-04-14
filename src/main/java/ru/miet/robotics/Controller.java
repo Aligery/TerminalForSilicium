@@ -6,8 +6,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Controller {
@@ -28,55 +34,116 @@ public class Controller {
     @FXML
     private TextField textField;
     @FXML
-    private TextArea textArea;
+    private TextArea sendedInfo;
 
     private static Settings settings = new Settings();
-
-    private static ConnectionToSerialPort connectionToSerialPort = new ConnectionToSerialPort();
 
     private List<String> listForTextArea=  new ArrayList<String>();
 
     private static SerialPort serialPort = new SerialPort(settings.getComPort());
 
+    DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+    Date date = new Date();
+
     @FXML
     private void actionOnButtonOne(ActionEvent actionEvent) {
-        listForTextArea.add(connectionToSerialPort.getConnection(serialPort, settings, settings.getCommandForButtonOne()));
+        listForTextArea.add(sendData(settings.getCommandForButtonOne()));
         setTextArea(listForTextArea);
     }
     @FXML
     private void actiononButtonTwo(ActionEvent actionEvent){
-        listForTextArea.add(connectionToSerialPort.getConnection(serialPort, settings, settings.getCommandForButtonTwo()));
+        listForTextArea.add(sendData(settings.getCommandForButtonTwo()));
         setTextArea(listForTextArea);
     }
     @FXML
     private void actionOnButtonThree(ActionEvent actionEvent) {
-        listForTextArea.add(connectionToSerialPort.getConnection(serialPort, settings, settings.getCommandForButtonThree()));
+        listForTextArea.add(sendData(settings.getCommandForButtonThree()));
         setTextArea(listForTextArea);
     }
     @FXML
     private void actionOnButtonFour(ActionEvent actionEvent) {
-        listForTextArea.add(connectionToSerialPort.getConnection(serialPort, settings, settings.getCommandForButtonFour()));
+        listForTextArea.add(sendData(settings.getCommandForButtonFour()));
         setTextArea(listForTextArea);
     }
     @FXML
     private void actionOnButtonFive(ActionEvent actionEvent) {
-        listForTextArea.add(connectionToSerialPort.getConnection(serialPort, settings, settings.getCommandForButtonFive()));
+        listForTextArea.add(sendData(settings.getCommandForButtonFive()));
         setTextArea(listForTextArea);
     }
     @FXML
     private void actionOnButtonSix(ActionEvent actionEvent) {
-        listForTextArea.add(connectionToSerialPort.getConnection(serialPort, settings, settings.getCommandForButtonSix()));
+        listForTextArea.add(sendData(settings.getCommandForButtonSix()));
         setTextArea(listForTextArea);
     }
     @FXML
     private void actionOnHandButton(ActionEvent actionEvent) {
-        listForTextArea.add(connectionToSerialPort.getConnection(serialPort, settings, Integer.parseInt(textField.getText())));
+        listForTextArea.add(sendData(textField.getText()));
         setTextArea(listForTextArea);
     }
 
     private void setTextArea(List<String> strings) {
         for (String element:strings) {
-            textArea.setText(element);
+            sendedInfo.setText(element);
+        }
+    }
+
+    private String sendData(String data) {
+        try {
+            serialPort.openPort();
+            serialPort.setParams(Integer.parseInt(settings.getBaudRate()),
+                    Integer.parseInt(settings.getDataBits()),
+                    Integer.parseInt(settings.getStopBits()),
+                    Integer.parseInt(settings.getStopBits()),
+                    false, //RTS
+                    true); //DTR
+            //Включаем аппаратное управление потоком
+            serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
+                    SerialPort.FLOWCONTROL_RTSCTS_OUT);
+            //Устанавливаем ивент лисенер и маску
+            serialPort.addEventListener(new PortReader(), SerialPort.MASK_RXCHAR);
+            //Отправляем запрос устройству
+            serialPort.writeString(data);
+            return "команда" + data + "отправлена." + " Время" + dateFormat.format(date);
+        } catch (SerialPortException ex) {
+            System.out.println(ex);
+        }
+//        finally {
+//            try {
+//                serialPort.closePort(); //костыль лютый, ну а хули, а нехуй
+//                return "Порт закрыт";
+//            } catch (SerialPortException ex) {
+//                System.out.println(ex);
+//            }
+//        }
+    }
+
+    private static class PortReader implements SerialPortEventListener {
+
+        @FXML
+        private TextArea recievedInfo;
+
+        private List<String> listForTextArea=  new ArrayList<String>();
+        private void setTextArea(List<String> strings) {
+            for (String element:strings) {
+                recievedInfo.setText(element);
+            }
+        }
+
+        public void serialEvent(SerialPortEvent event) {
+            if(event.isRXCHAR() && event.getEventValue() > 0){
+                try {
+                    //Получаем ответ от устройства, обрабатываем данные и т.д.
+                    String data = serialPort.readString(event.getEventValue());
+                    listForTextArea.add(data);
+                    setTextArea(listForTextArea);
+                    //И снова отправляем запрос
+                    //serialPort.writeString("Get data");
+                }
+                catch (SerialPortException ex) {
+                    System.out.println(ex);
+                }
+            }
         }
     }
 }

@@ -9,40 +9,39 @@ import java.util.Properties;
 
 public class Settings {
 
-    private int commandForButtonOne;
-    private int commandForButtonTwo;
-    private int commandForButtonThree;
-    private int commandForButtonFour;
-    private int commandForButtonFive;
-    private int commandForButtonSix;
+    private String commandForButtonOne;
+    private String commandForButtonTwo;
+    private String commandForButtonThree;
+    private String commandForButtonFour;
+    private String commandForButtonFive;
+    private String commandForButtonSix;
     private String comPort;
-    private int baudRate;
-    private int dataBits;
-    private int stopBits;
-    private int parity;
+    private String baudRate;
+    private String dataBits;
+    private String stopBits;
+    private String parity;
 
-
-    public int getCommandForButtonOne() {
+    public String getCommandForButtonOne() {
         return commandForButtonOne;
     }
 
-    public int getCommandForButtonTwo() {
+    public String getCommandForButtonTwo() {
         return commandForButtonTwo;
     }
 
-    public int getCommandForButtonThree() {
+    public String getCommandForButtonThree() {
         return commandForButtonThree;
     }
 
-    public int getCommandForButtonFour() {
+    public String getCommandForButtonFour() {
         return commandForButtonFour;
     }
 
-    public int getCommandForButtonFive() {
+    public String getCommandForButtonFive() {
         return commandForButtonFive;
     }
 
-    public int getCommandForButtonSix() {
+    public String getCommandForButtonSix() {
         return commandForButtonSix;
     }
 
@@ -50,19 +49,19 @@ public class Settings {
         return comPort;
     }
 
-    public int getBaudRate() {
+    public String getBaudRate() {
         return baudRate;
     }
 
-    public int getDataBits() {
+    public String getDataBits() {
         return dataBits;
     }
 
-    public int getStopBits() {
+    public String getStopBits() {
         return stopBits;
     }
 
-    public int getParity() {
+    public String getParity() {
         return parity;
     }
 
@@ -72,17 +71,17 @@ public class Settings {
         try {
             fis = new FileInputStream("src/main/resources/application.properties");
             property.load(fis);
-            this.commandForButtonOne=Integer.parseInt(property.getProperty("commandForButtonOne"));
-            this.commandForButtonTwo=Integer.parseInt(property.getProperty("commandForButtonTwo"));
-            this.commandForButtonThree=Integer.parseInt(property.getProperty("commandForButtonThree"));
-            this.commandForButtonFour=Integer.parseInt(property.getProperty("commandForButtonFour"));
-            this.commandForButtonFive=Integer.parseInt(property.getProperty("commandForButtonFive"));
-            this.commandForButtonSix=Integer.parseInt(property.getProperty("commandForButtonSix"));
+            this.commandForButtonOne=property.getProperty("commandForButtonOne");
+            this.commandForButtonTwo=property.getProperty("commandForButtonTwo");
+            this.commandForButtonThree=property.getProperty("commandForButtonThree");
+            this.commandForButtonFour=property.getProperty("commandForButtonFour");
+            this.commandForButtonFive=property.getProperty("commandForButtonFive");
+            this.commandForButtonSix=property.getProperty("commandForButtonSix");
             this.comPort=property.getProperty("comPort");
-            this.baudRate=Integer.parseInt(property.getProperty("baudRate"));
-            this.dataBits=Integer.parseInt(property.getProperty("dataBits"));
-            this.stopBits=Integer.parseInt(property.getProperty("stopBits"));
-            this.parity=Integer.parseInt(property.getProperty("parity"));
+            this.baudRate=property.getProperty("baudRate");
+            this.dataBits=property.getProperty("dataBits");
+            this.stopBits=property.getProperty("stopBits");
+            this.parity=property.getProperty("parity");
 
         } catch (IOException e) {
             System.err.println("ОШИБКА: Файл свойств отсуствует!");
