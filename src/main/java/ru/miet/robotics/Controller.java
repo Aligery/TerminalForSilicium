@@ -10,6 +10,8 @@ import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,6 +37,8 @@ public class Controller {
     private TextField textField;
     @FXML
     private TextArea sendedInfo;
+    @FXML
+    public TextArea recievedInfo;
 
     private static Settings settings = new Settings();
 
@@ -104,14 +108,14 @@ public class Controller {
             serialPort.addEventListener(new PortReader(), SerialPort.MASK_RXCHAR);
             //Отправляем запрос устройству
             serialPort.writeString(data);
-            return "команда" + data + "отправлена." + " Время" + dateFormat.format(date);
+            return "Команда " + data + " отправлена." + " Время" + dateFormat.format(date);
         } catch (SerialPortException ex) {
             System.out.println(ex);
+            return ex.toString();
         }
 //        finally {
 //            try {
-//                serialPort.closePort(); //костыль лютый, ну а хули, а нехуй
-//                return "Порт закрыт";
+//                serialPort.closePort(); //костыль лютый, ну а хули, а нехуй, implements autocloseble не реализован у класса
 //            } catch (SerialPortException ex) {
 //                System.out.println(ex);
 //            }
@@ -120,28 +124,32 @@ public class Controller {
 
     private static class PortReader implements SerialPortEventListener {
 
-        @FXML
-        private TextArea recievedInfo;
+//        @FXML
+//        private TextArea recievedInfo;
 
-        private List<String> listForTextArea=  new ArrayList<String>();
-        private void setTextArea(List<String> strings) {
-            for (String element:strings) {
-                recievedInfo.setText(element);
-            }
-        }
+        private static List<String> listForTextArea=  new ArrayList<String>();
+
+
 
         public void serialEvent(SerialPortEvent event) {
             if(event.isRXCHAR() && event.getEventValue() > 0){
                 try {
                     //Получаем ответ от устройства, обрабатываем данные и т.д.
                     String data = serialPort.readString(event.getEventValue());
-                    listForTextArea.add(data);
-                    setTextArea(listForTextArea);
+                    try (FileWriter fileWriter = new FileWriter("InfoFromController.txt", true)){
+                        fileWriter.write(data);
+                        fileWriter.append('\n');
+                        fileWriter.flush();
+                    };
+
                     //И снова отправляем запрос
                     //serialPort.writeString("Get data");
                 }
                 catch (SerialPortException ex) {
                     System.out.println(ex);
+                }
+                catch (IOException IO) {
+                    System.out.println(IO);
                 }
             }
         }
