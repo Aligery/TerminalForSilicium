@@ -10,6 +10,7 @@ import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -17,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 
 public class Controller {
     @FXML
@@ -44,6 +46,8 @@ public class Controller {
 
     private List<String> listForTextArea=  new ArrayList<String>();
 
+    private List<String> recievedText = new ArrayList<>();
+
     private static SerialPort serialPort = new SerialPort(settings.getComPort());
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -52,37 +56,37 @@ public class Controller {
 
     @FXML
     private void actionOnButtonOne(ActionEvent actionEvent) {
-        listForTextArea.add(sendData(settings.getCommandForButtonOne()));
+        sendData(settings.getCommandForButtonOne());
         setTextArea(listForTextArea);
     }
     @FXML
     private void actiononButtonTwo(ActionEvent actionEvent){
-        listForTextArea.add(sendData(settings.getCommandForButtonTwo()));
+        sendData(settings.getCommandForButtonTwo());
         setTextArea(listForTextArea);
     }
     @FXML
     private void actionOnButtonThree(ActionEvent actionEvent) {
-        listForTextArea.add(sendData(settings.getCommandForButtonThree()));
+        sendData(settings.getCommandForButtonThree());
         setTextArea(listForTextArea);
     }
     @FXML
     private void actionOnButtonFour(ActionEvent actionEvent) {
-        listForTextArea.add(sendData(settings.getCommandForButtonFour()));
+        sendData(settings.getCommandForButtonFour());
         setTextArea(listForTextArea);
     }
     @FXML
     private void actionOnButtonFive(ActionEvent actionEvent) {
-        listForTextArea.add(sendData(settings.getCommandForButtonFive()));
+        sendData(settings.getCommandForButtonFive());
         setTextArea(listForTextArea);
     }
     @FXML
     private void actionOnButtonSix(ActionEvent actionEvent) {
-        listForTextArea.add(sendData(settings.getCommandForButtonSix()));
+        sendData(settings.getCommandForButtonSix());
         setTextArea(listForTextArea);
     }
     @FXML
     private void actionOnHandButton(ActionEvent actionEvent) {
-        listForTextArea.add(sendData(textField.getText()));
+        sendData(textField.getText());
         setTextArea(listForTextArea);
     }
 
@@ -92,7 +96,7 @@ public class Controller {
         }
     }
 
-    private String sendData(String data) {
+    private void sendData(String data) {
         try {
             serialPort.openPort();
             serialPort.setParams(Integer.parseInt(settings.getBaudRate()),
@@ -100,36 +104,43 @@ public class Controller {
                     Integer.parseInt(settings.getStopBits()),
                     Integer.parseInt(settings.getStopBits()),
                     false, //RTS
-                    true); //DTR
-            //Включаем аппаратное управление потоком
-            serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
-                    SerialPort.FLOWCONTROL_RTSCTS_OUT);
-            //Устанавливаем ивент лисенер и маску
-            serialPort.addEventListener(new PortReader(), SerialPort.MASK_RXCHAR);
-            //Отправляем запрос устройству
+                    false); //DTR
+            serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
+            serialPort.addEventListener(new EventListener ());
             serialPort.writeString(data);
-            return "Команда " + data + " отправлена." + " Время" + dateFormat.format(date);
+            listForTextArea.add("Команда " + data + " отправлена." + " Время" + dateFormat.format(date));
         } catch (SerialPortException ex) {
             System.out.println(ex);
-            return ex.toString();
         }
-//        finally {
-//            try {
-//                serialPort.closePort(); //костыль лютый, ну а хули, а нехуй, implements autocloseble не реализован у класса
-//            } catch (SerialPortException ex) {
-//                System.out.println(ex);
-//            }
-//        }
+        finally {
+            try {
+                serialPort.closePort(); //boiler plate code, к сожалению, implements autocloseble не реализован у класса
+            } catch (SerialPortException ex) {
+                System.out.println(ex);
+            }
+        }
     }
 
-    private static class PortReader implements SerialPortEventListener {
+    private void getData(){
+        try(FileReader fr = new FileReader("InfoFromController.txt")) {
+            Scanner scan = new Scanner(fr);
+            while (scan.hasNextLine()) {
+                recievedText.add(scan.nextLine());
+            }
+        } catch (Exception e) {
+            System.out.print(e);
+        }
+    }
 
-//        @FXML
-//        private TextArea recievedInfo;
+    private void setTextRecievied(List<String> strings) {
+        for (String element:strings) {
+            recievedInfo.setText(element);
+        }
+    }
+
+    private static class EventListener implements SerialPortEventListener {
 
         private static List<String> listForTextArea=  new ArrayList<String>();
-
-
 
         public void serialEvent(SerialPortEvent event) {
             if(event.isRXCHAR() && event.getEventValue() > 0){
@@ -140,17 +151,14 @@ public class Controller {
                         fileWriter.write(data);
                         fileWriter.append('\n');
                         fileWriter.flush();
-                    };
-
-                    //И снова отправляем запрос
-                    //serialPort.writeString("Get data");
+                    } catch (IOException IO) {
+                        System.out.println(IO);
+                    }
                 }
                 catch (SerialPortException ex) {
                     System.out.println(ex);
                 }
-                catch (IOException IO) {
-                    System.out.println(IO);
-                }
+
             }
         }
     }
